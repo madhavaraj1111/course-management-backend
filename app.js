@@ -9,6 +9,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const studentRoutes = require("./routes/studentRoutes");
+const ragRoutes = require("./routes/ragRoutes");
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api", progressRoutes); // Progress routes use /api prefix
 app.use("/api/student", studentRoutes);
-
+app.use("/api/rag", ragRoutes);
 
 
 // Health check endpoint

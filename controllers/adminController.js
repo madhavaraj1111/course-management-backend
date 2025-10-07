@@ -1,5 +1,6 @@
 const Course = require("../models/Course");
 const Progress = require("../models/Progress");
+const ragService = require("../services/ragService");
 
 // Create course
 const createCourse = async (req, res) => {
@@ -14,6 +15,16 @@ const createCourse = async (req, res) => {
     });
 
     await course.save();
+
+    // Index in RAG system
+    try {
+      await ragService.indexCourse(course);
+      console.log("✅ Course indexed in RAG");
+    } catch (ragError) {
+      console.error("⚠️ RAG indexing failed:", ragError.message);
+      // Don't fail the request if RAG fails
+    }
+
     res.status(201).json(course);
   } catch (error) {
     console.error("Full error:", error);
@@ -119,6 +130,18 @@ const updateCourse = async (req, res) => {
 
     // Sync progress for all enrolled students
     await syncProgressAfterCourseUpdate(req.params.id, updatedCourse.sections);
+
+    // Update RAG index
+    try {
+      await ragService.updateCourseIndex(
+        req.params.id.toString(),
+        updatedCourse
+      );
+      console.log("✅ Course updated in RAG");
+    } catch (ragError) {
+      console.error("⚠️ RAG update failed:", ragError.message);
+    }
+
     res.json(updatedCourse);
   } catch (error) {
     console.error("Update course error:", error);
@@ -142,6 +165,14 @@ const deleteCourse = async (req, res) => {
 
     await Course.findByIdAndDelete(req.params.id);
     await Progress.deleteMany({ course: req.params.id });
+
+    // Delete from RAG index
+    try {
+      await ragService.deleteCourseIndex(req.params.id.toString());
+      console.log("✅ Course deleted from RAG");
+    } catch (ragError) {
+      console.error("⚠️ RAG deletion failed:", ragError.message);
+    }
 
     res.json({ message: "Course deleted successfully" });
   } catch (error) {
