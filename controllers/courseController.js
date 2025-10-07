@@ -1,6 +1,7 @@
 const Course = require("../models/Course");
 const User = require("../models/User");
 const Progress = require("../models/Progress");
+const ragService = require("../services/ragService");
 
 // Get all courses (for browsing)
 const getAllCourses = async (req, res) => {
@@ -38,8 +39,8 @@ const getAllCourses = async (req, res) => {
 // Get course details
 const getCourseById = async (req, res) => {
   try {
-    console.log("Fetching course:", req.params.id); // Debug
-    console.log("User ID:", req.user.userId); // Debug
+    console.log("Fetching course:", req.params.id);
+    console.log("User ID:", req.user.userId);
 
     const course = await Course.findById(req.params.id).populate(
       "instructor",
@@ -50,18 +51,18 @@ const getCourseById = async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    console.log("Course found:", course.title); // Debug
+    console.log("Course found:", course.title);
 
     // Check if user is enrolled
     const user = await User.findById(req.user.userId);
-    console.log("User found:", user ? user.username : "null"); // Debug
+    console.log("User found:", user ? user.username : "null");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const isEnrolled = user.enrolledCourses.includes(course._id);
-    console.log("Is enrolled:", isEnrolled); // Debug
+    console.log("Is enrolled:", isEnrolled);
 
     // Get progress if enrolled
     let progress = null;
@@ -72,7 +73,7 @@ const getCourseById = async (req, res) => {
       });
     }
 
-    console.log("Sending response"); // Debug
+    console.log("Sending response");
 
     res.json({
       ...course.toObject(),
@@ -80,7 +81,7 @@ const getCourseById = async (req, res) => {
       progress: progress ? progress.completedLessons : [],
     });
   } catch (error) {
-    console.error("getCourseById error:", error); // Debug
+    console.error("getCourseById error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
