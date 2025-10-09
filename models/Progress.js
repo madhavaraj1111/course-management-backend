@@ -12,6 +12,7 @@ const progressSchema = new mongoose.Schema({
       sectionId: { type: mongoose.Schema.Types.ObjectId },
       lessonId: { type: mongoose.Schema.Types.ObjectId },
     },
+    
   ],
   overallProgress: { type: Number, default: 0 },
   lastAccessed: { type: Date, default: Date.now },
