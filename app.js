@@ -1,15 +1,18 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const connectDB = require("./config/db");
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import cors from "cors";
+import connectDB from "./config/db.js";
+import arcjetMiddleware from "./middleware/arcjet.middleware.js";
 
 // Import routes
-const authRoutes = require("./routes/authRoutes");
-const adminRoutes = require("./routes/adminRoutes");
-const courseRoutes = require("./routes/courseRoutes");
-const progressRoutes = require("./routes/progressRoutes");
-const studentRoutes = require("./routes/studentRoutes");
-const ragRoutes = require("./routes/ragRoutes");
+import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
+import progressRoutes from "./routes/progressRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
+import ragRoutes from "./routes/ragRoutes.js";
 
 const app = express();
 
@@ -19,6 +22,7 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(arcjetMiddleware);
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -27,7 +31,6 @@ app.use("/api/courses", courseRoutes);
 app.use("/api", progressRoutes); // Progress routes use /api prefix
 app.use("/api/student", studentRoutes);
 app.use("/api/rag", ragRoutes);
-
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -47,4 +50,4 @@ app.use("*", (req, res) => {
   });
 });
 
-module.exports = app;
+export default app;

@@ -1,11 +1,11 @@
-const weaviate = require("weaviate-client");
-const { GoogleGenAI } = require("@google/genai");
+import weaviate from "weaviate-client";
+import { GoogleGenAI } from "@google/genai";
 
 let weaviateClient = null;
 let geminiAI = null;
 
 // Initialize clients
-async function initializeRAG() {
+export async function initializeRAG() {
   if (!weaviateClient) {
     weaviateClient = await weaviate.connectToWeaviateCloud(
       process.env.WEAVIATE_URL,
@@ -25,7 +25,7 @@ async function initializeRAG() {
 }
 
 // Generate embedding
-async function generateEmbedding(text) {
+export async function generateEmbedding(text) {
   const { geminiAI } = await initializeRAG();
   const response = await geminiAI.models.embedContent({
     model: "text-embedding-004",
@@ -35,12 +35,11 @@ async function generateEmbedding(text) {
 }
 
 // Index course content
-async function indexCourse(course) {
+export async function indexCourse(course) {
   try {
     const { weaviateClient } = await initializeRAG();
     const courses = weaviateClient.collections.use("Course");
 
-    // Build text from your actual course schema
     const sectionTitles = course.sections?.map((s) => s.title).join(" ") || "";
     const lessonTitles =
       course.sections
@@ -74,12 +73,11 @@ async function indexCourse(course) {
 }
 
 // Update course index
-async function updateCourseIndex(courseId, course) {
+export async function updateCourseIndex(courseId, course) {
   try {
     const { weaviateClient } = await initializeRAG();
     const courses = weaviateClient.collections.use("Course");
 
-    // Delete old entry
     const oldResults = await courses.query.fetchObjects({
       filters: courses.filter.byProperty("courseId").equal(courseId),
       limit: 1,
@@ -89,7 +87,6 @@ async function updateCourseIndex(courseId, course) {
       await courses.data.deleteById(oldResults.objects[0].uuid);
     }
 
-    // Re-index with new data
     await indexCourse(course);
   } catch (error) {
     console.error("Error updating course index:", error);
@@ -98,7 +95,7 @@ async function updateCourseIndex(courseId, course) {
 }
 
 // Delete course from index
-async function deleteCourseIndex(courseId) {
+export async function deleteCourseIndex(courseId) {
   try {
     const { weaviateClient } = await initializeRAG();
     const courses = weaviateClient.collections.use("Course");
@@ -119,7 +116,7 @@ async function deleteCourseIndex(courseId) {
 }
 
 // Search courses using RAG
-async function searchCourses(query, limit = 5) {
+export async function searchCourses(query, limit = 5) {
   try {
     const { weaviateClient, geminiAI } = await initializeRAG();
     const queryVector = await generateEmbedding(query);
@@ -168,7 +165,7 @@ If the information doesn't fully answer the question, provide your best recommen
 }
 
 // Setup collection (run once)
-async function setupCollection() {
+export async function setupCollection() {
   try {
     const { weaviateClient } = await initializeRAG();
 
@@ -189,12 +186,3 @@ async function setupCollection() {
     throw error;
   }
 }
-
-module.exports = {
-  initializeRAG,
-  indexCourse,
-  updateCourseIndex,
-  deleteCourseIndex,
-  searchCourses,
-  setupCollection,
-};

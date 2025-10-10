@@ -1,9 +1,9 @@
-const Course = require("../models/Course");
-const Progress = require("../models/Progress");
-const ragService = require("../services/ragService");
+import Course from "../models/Course.js";
+import Progress from "../models/Progress.js";
+import * as ragService from "../services/ragService.js";
 
 // Create course
-const createCourse = async (req, res) => {
+export const createCourse = async (req, res) => {
   try {
     console.log("req.user:", req.user);
     console.log("req.body:", req.body);
@@ -33,7 +33,7 @@ const createCourse = async (req, res) => {
 };
 
 // Get admin's courses
-const getAdminCourses = async (req, res) => {
+export const getAdminCourses = async (req, res) => {
   try {
     const courses = await Course.find({
       instructor: req.user.userId,
@@ -47,7 +47,6 @@ const getAdminCourses = async (req, res) => {
 // Helper function to sync progress after course update
 const syncProgressAfterCourseUpdate = async (courseId, updatedSections) => {
   try {
-    // Get all valid section and lesson IDs from updated course
     const validSectionIds = new Set();
     const validLessonIds = new Set();
 
@@ -58,33 +57,26 @@ const syncProgressAfterCourseUpdate = async (courseId, updatedSections) => {
       });
     });
 
-    // Find all progress records for this course
     const progressRecords = await Progress.find({ course: courseId });
 
-    // Update each progress record
     for (const progress of progressRecords) {
       let hasChanges = false;
 
-      // Filter out orphaned completed lessons
       const validCompletedLessons = progress.completedLessons.filter(
         (completion) => {
           const sectionValid = validSectionIds.has(
             completion.sectionId.toString()
           );
-          const lessonValid = validLessonIds.has(
-            completion.lessonId.toString()
-          );
+          const lessonValid = validLessonIds.has(completion.lessonId.toString());
           return sectionValid && lessonValid;
         }
       );
 
-      // Check if any lessons were removed
       if (validCompletedLessons.length !== progress.completedLessons.length) {
         hasChanges = true;
         progress.completedLessons = validCompletedLessons;
       }
 
-      // Recalculate overall progress
       if (hasChanges) {
         const totalLessons = updatedSections.reduce(
           (acc, section) => acc + section.lessons.length,
@@ -108,7 +100,7 @@ const syncProgressAfterCourseUpdate = async (courseId, updatedSections) => {
 };
 
 // Update course
-const updateCourse = async (req, res) => {
+export const updateCourse = async (req, res) => {
   try {
     const course = await Course.findOne({
       _id: req.params.id,
@@ -121,22 +113,16 @@ const updateCourse = async (req, res) => {
         .json({ message: "Course not found or unauthorized" });
     }
 
-    // Update the course
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
 
-    // Sync progress for all enrolled students
     await syncProgressAfterCourseUpdate(req.params.id, updatedCourse.sections);
 
-    // Update RAG index
     try {
-      await ragService.updateCourseIndex(
-        req.params.id.toString(),
-        updatedCourse
-      );
+      await ragService.updateCourseIndex(req.params.id.toString(), updatedCourse);
       console.log("✅ Course updated in RAG");
     } catch (ragError) {
       console.error("⚠️ RAG update failed:", ragError.message);
@@ -150,7 +136,7 @@ const updateCourse = async (req, res) => {
 };
 
 // Delete course
-const deleteCourse = async (req, res) => {
+export const deleteCourse = async (req, res) => {
   try {
     const course = await Course.findOne({
       _id: req.params.id,
@@ -166,7 +152,6 @@ const deleteCourse = async (req, res) => {
     await Course.findByIdAndDelete(req.params.id);
     await Progress.deleteMany({ course: req.params.id });
 
-    // Delete from RAG index
     try {
       await ragService.deleteCourseIndex(req.params.id.toString());
       console.log("✅ Course deleted from RAG");
@@ -181,7 +166,7 @@ const deleteCourse = async (req, res) => {
 };
 
 // Get admin dashboard stats
-const getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
   try {
     const totalCourses = await Course.countDocuments({
       instructor: req.user.userId,
@@ -212,12 +197,4 @@ const getDashboardStats = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
-};
-
-module.exports = {
-  createCourse,
-  getAdminCourses,
-  updateCourse,
-  deleteCourse,
-  getDashboardStats,
 };
