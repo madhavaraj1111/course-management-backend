@@ -1,8 +1,9 @@
-const express = require("express");
+import { searchCourses } from "../controllers/ragController.js";
+import auth from "../middleware/auth.js";
+import express from "express";
+
 const router = express.Router();
-const ragController = require("../controllers/ragController");
-const auth = require("../middleware/auth");
 
-router.post("/search", auth, ragController.searchCourses);
+router.post("/search", auth, searchCourses);
 
-module.exports = router;
+export default router;

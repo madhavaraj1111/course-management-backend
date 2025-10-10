@@ -1,8 +1,8 @@
-const User = require("../models/User");
-const Progress = require("../models/Progress");
+import User from "../models/User.js";
+import Progress from "../models/Progress.js";
 
 // Get student dashboard data
-const getStudentDashboard = async (req, res) => {
+export const getStudentDashboard = async (req, res) => {
   try {
     if (req.user.role !== "student") {
       return res.status(403).json({ message: "Student access required" });
@@ -47,8 +47,4 @@ const getStudentDashboard = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
-};
-
-module.exports = {
-  getStudentDashboard,
 };

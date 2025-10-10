@@ -1,6 +1,6 @@
-const ragService = require("../services/ragService");
+import * as ragService from "../services/ragService.js";
 
-exports.searchCourses = async (req, res) => {
+export const searchCourses = async (req, res) => {
   try {
     const { query, limit } = req.body;
 

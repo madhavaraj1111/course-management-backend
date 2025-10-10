@@ -1,7 +1,9 @@
-require("dotenv").config();
-const connectDB = require("../config/db");
-const Course = require("../models/Course");
-const ragService = require("../services/ragService");
+import dotenv from "dotenv";
+dotenv.config();
+
+import connectDB from "../config/db.js";
+import Course from "../models/Course.js";
+import ragService from "../services/ragService.js";
 
 async function setupAndIndexCourses() {
   try {

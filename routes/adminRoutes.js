@@ -1,13 +1,13 @@
-const express = require('express');
-const authenticateToken = require('../middleware/auth');
-const requireAdmin = require('../middleware/admin');
-const {
+import express from "express";
+import authenticateToken from "../middleware/auth.js";
+import requireAdmin from "../middleware/admin.js";
+import {
   createCourse,
   getAdminCourses,
   updateCourse,
   deleteCourse,
   getDashboardStats,
-} = require('../controllers/adminController');
+} from "../controllers/adminController.js";
 
 const router = express.Router();
 
@@ -15,10 +15,10 @@ const router = express.Router();
 router.use(authenticateToken);
 router.use(requireAdmin);
 
-router.post('/courses', createCourse);
-router.get('/courses', getAdminCourses);
-router.put('/courses/:id', updateCourse);
-router.delete('/courses/:id', deleteCourse);
-router.get('/dashboard', getDashboardStats);
+router.post("/courses", createCourse);
+router.get("/courses", getAdminCourses);
+router.put("/courses/:id", updateCourse);
+router.delete("/courses/:id", deleteCourse);
+router.get("/dashboard", getDashboardStats);
 
-module.exports = router;
+export default router;

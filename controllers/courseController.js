@@ -1,10 +1,10 @@
-const Course = require("../models/Course");
-const User = require("../models/User");
-const Progress = require("../models/Progress");
-const ragService = require("../services/ragService");
+import Course from "../models/Course.js";
+import User from "../models/User.js";
+import Progress from "../models/Progress.js";
+import * as ragService from "../services/ragService.js";
 
 // Get all courses (for browsing)
-const getAllCourses = async (req, res) => {
+export const getAllCourses = async (req, res) => {
   try {
     const { category, difficulty, instructor, search } = req.query;
     let query = {};
@@ -37,7 +37,7 @@ const getAllCourses = async (req, res) => {
 };
 
 // Get course details
-const getCourseById = async (req, res) => {
+export const getCourseById = async (req, res) => {
   try {
     console.log("Fetching course:", req.params.id);
     console.log("User ID:", req.user.userId);
@@ -87,7 +87,7 @@ const getCourseById = async (req, res) => {
 };
 
 // Enroll in course
-const enrollInCourse = async (req, res) => {
+export const enrollInCourse = async (req, res) => {
   try {
     if (req.user.role !== "student") {
       return res.status(403).json({ message: "Only students can enroll" });
@@ -124,10 +124,4 @@ const enrollInCourse = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
-};
-
-module.exports = {
-  getAllCourses,
-  getCourseById,
-  enrollInCourse,
 };

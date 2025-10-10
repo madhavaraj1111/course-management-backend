@@ -1,8 +1,8 @@
-const Progress = require('../models/Progress');
-const Course = require('../models/Course');
+import Progress from "../models/Progress.js";
+import Course from "../models/Course.js";
 
 // Mark lesson as complete
-const markLessonComplete = async (req, res) => {
+export const markLessonComplete = async (req, res) => {
   try {
     const { courseId, sectionId, lessonId } = req.params;
 
@@ -12,7 +12,7 @@ const markLessonComplete = async (req, res) => {
     });
 
     if (!progress) {
-      return res.status(404).json({ message: 'Not enrolled in this course' });
+      return res.status(404).json({ message: "Not enrolled in this course" });
     }
 
     // Check if lesson already completed
@@ -43,14 +43,10 @@ const markLessonComplete = async (req, res) => {
     }
 
     res.json({
-      message: 'Lesson marked as complete',
+      message: "Lesson marked as complete",
       progress: progress.overallProgress,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-};
-
-module.exports = {
-  markLessonComplete,
 };

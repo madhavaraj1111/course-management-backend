@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const progressSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   course: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
+    ref: "Course",
     required: true,
   },
   completedLessons: [
@@ -12,10 +12,9 @@ const progressSchema = new mongoose.Schema({
       sectionId: { type: mongoose.Schema.Types.ObjectId },
       lessonId: { type: mongoose.Schema.Types.ObjectId },
     },
-    
   ],
   overallProgress: { type: Number, default: 0 },
   lastAccessed: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Progress', progressSchema);
+export default mongoose.model("Progress", progressSchema);

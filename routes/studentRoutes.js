@@ -1,12 +1,12 @@
-const express = require('express');
-const authenticateToken = require('../middleware/auth');
-const { getStudentDashboard } = require('../controllers/studentController');
+import express from "express";
+import authenticateToken from "../middleware/auth.js";
+import { getStudentDashboard } from "../controllers/studentController.js";
 
 const router = express.Router();
 
 // All student routes require authentication
 router.use(authenticateToken);
 
-router.get('/dashboard', getStudentDashboard);
+router.get("/dashboard", getStudentDashboard);
 
-module.exports = router;
+export default router;
