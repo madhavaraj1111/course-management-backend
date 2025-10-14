@@ -2,9 +2,11 @@ import dotenv from "dotenv";
 import arcjet, { shield, detectBot, tokenBucket } from "@arcjet/node";
 dotenv.config();
 
+
+
 const aj = arcjet({
   key: process.env.ARCJET_KEY,
-  // Remove ip.src from characteristics - we'll pass it explicitly
+  characteristics: ["ip.src"],
   rules: [
     shield({ mode: "LIVE" }),
     detectBot({
@@ -19,5 +21,6 @@ const aj = arcjet({
     }),
   ],
 });
+
 
 export default aj;
