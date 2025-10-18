@@ -15,6 +15,7 @@ export async function initializeRAG() {
     );
   }
 
+
   if (!geminiAI) {
     geminiAI = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
